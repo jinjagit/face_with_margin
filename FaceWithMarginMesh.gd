@@ -23,6 +23,8 @@ func generate_mesh():
 	var index_array := PoolIntArray()
 	
 	var resolution := 5
+	var margin := 3
+	var width := resolution + (2 * margin)
 	var num_vertices : int = resolution * resolution
 	var num_indices : int = (resolution - 1) * (resolution -1) * 6
 	
@@ -34,17 +36,24 @@ func generate_mesh():
 	var tri_index : int = 0
 	var axisA := Vector3(normal.y, normal.z, normal.x)
 	var axisB : Vector3 = normal.cross(axisA)
+	var percent := Vector2(0.0, 0.0)
+	var pointOnUnitCube := Vector3(0.0, 0.0, 0.0)
+	var i : int = 0
+	
 	for y in range(resolution):
 		for x in range(resolution):
-			var i : int = x + y * resolution
-			var percent := Vector2(x, y) / (resolution - 1)
-			var pointOnUnitCube : Vector3 = normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+			#var i : int = x + y * resolution
+			
+			if x >= 0 and x < resolution and y >= 0 and y < resolution:
+				percent = Vector2(x, y) / (resolution - 1)
+				pointOnUnitCube = normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+				# Must convert integers to floats!
+				uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (resolution - 1))
 			
 			#vertex_array[i] = spherize(pointOnUnitCube)
-			vertex_array[i] = pointOnUnitCube * 0.65
+			vertex_array[i] = pointOnUnitCube
 			
-			# Must convert integers to floats!
-			uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (resolution - 1))
+			
 			
 			#if x < 3 and y == 0:
 				#vertex_array[i] = pointOnUnitCube * 0.5
@@ -58,6 +67,8 @@ func generate_mesh():
 				index_array[tri_index + 4] = i + 1
 				index_array[tri_index + 3] = i + resolution + 1
 				tri_index += 6
+				
+			i += 1
 				
 	# Calculate normal for each triangle
 	for a in range(0, index_array.size(), 3):
@@ -74,8 +85,8 @@ func generate_mesh():
 		normal_array[index_array[c]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
 		
 	# Normalize length of normals
-	for i in range(normal_array.size()):
-		normal_array[i] = normal_array[i].normalized()
+	for j in range(normal_array.size()):
+		normal_array[j] = normal_array[j].normalized()
 		
 	arrays[Mesh.ARRAY_VERTEX] = vertex_array
 	arrays[Mesh.ARRAY_NORMAL] = normal_array
