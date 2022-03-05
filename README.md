@@ -1,5 +1,7 @@
-# Cube-sphere with 6 separate mesh faces
+# Cube-sphere face with margin
 
-Following the tutorial: https://www.youtube.com/watch?v=hHRhDEVwDho, which is, in turn, based on Sebastian Lague's work.
+Idea: Adding a margin means that triangles at edge of 'face' will be correctly curved to fit with curve formed by margin, rather than creating a visible 'seam' due to having no information on the mesh curve beyond the edge (as is case when mesh ends at the face edge).
 
-This looks fine with the default material, but I suspect the lack of information of neighboring triangle normals at the edges of the faces will lead to visible seams / texturing issues at some point. Maybe not, and this is just simpler.
+This should also mean we can tile the texture 9 times, using calculated uvs, if we somehow include vertices 'around' the face corners (to overcome the 3-way intersections a cube-sphere face corners which would make such tiling impossible.)
+
+We should also be able to 'flip' the triangles of the margin to effectively nmake their material / textures invisible from outside of the cube-sphere. All this taken together should provide us with seamless materials and the ability to place a single (and different) texture on each face (which could even, later, be a representation of 3-d noise, including noise that matches any used to displace vertices)
