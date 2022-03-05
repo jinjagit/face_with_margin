@@ -22,11 +22,11 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 	
-	var resolution := 5
-	var margin := 3
-	var width := resolution + (2 * margin)
-	var num_vertices : int = resolution * resolution
-	var num_indices : int = (resolution - 1) * (resolution -1) * 6
+	var resolution := 15
+	var margin := 7
+	var width := resolution + (2 * margin) # 11
+	var num_vertices : int = width * width
+	var num_indices : int = (width - 1) * (width -1) * 6
 	
 	vertex_array.resize(num_vertices)
 	uv_array.resize(num_vertices)
@@ -40,15 +40,17 @@ func generate_mesh():
 	var pointOnUnitCube := Vector3(0.0, 0.0, 0.0)
 	var i : int = 0
 	
-	for y in range(resolution):
-		for x in range(resolution):
-			#var i : int = x + y * resolution
+	for y in range(margin * -1, width - margin): # -3 <-> 8
+		for x in range(margin * -1, width - margin):
 			
 			if x >= 0 and x < resolution and y >= 0 and y < resolution:
 				percent = Vector2(x, y) / (resolution - 1)
 				pointOnUnitCube = normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
 				# Must convert integers to floats!
 				uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (resolution - 1))
+			else:
+				pointOnUnitCube = Vector3(0.0, 0.0, 0.0)
+				uv_array[i] = Vector2(0.0, 0.0)
 			
 			#vertex_array[i] = spherize(pointOnUnitCube)
 			vertex_array[i] = pointOnUnitCube
@@ -58,14 +60,14 @@ func generate_mesh():
 			#if x < 3 and y == 0:
 				#vertex_array[i] = pointOnUnitCube * 0.5
 			
-			if x != resolution - 1 and y != resolution - 1:
+			if x != width - margin - 1 and y != width - margin - 1:
 				index_array[tri_index + 2] = i
-				index_array[tri_index + 1] = i + resolution + 1
-				index_array[tri_index] = i + resolution
+				index_array[tri_index + 1] = i + width + 1
+				index_array[tri_index] = i + width
 				
 				index_array[tri_index + 5] = i
 				index_array[tri_index + 4] = i + 1
-				index_array[tri_index + 3] = i + resolution + 1
+				index_array[tri_index + 3] = i + width + 1
 				tri_index += 6
 				
 			i += 1
@@ -105,4 +107,4 @@ func _update_mesh(arrays : Array):
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	rotate_object_local(Vector3(0, 1, 0), delta/20)
+	rotate_object_local(Vector3(0, 1, 0), delta/5)
