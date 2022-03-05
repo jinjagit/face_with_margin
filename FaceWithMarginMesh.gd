@@ -74,7 +74,13 @@ func generate_mesh():
 				# TODO: display 'horizontally' as appropriate
 				percent = Vector2((x * 1.0) / (resolution - 1), 0.0)
 				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-				uv_array[i] = Vector2(0.0, 0.0)
+				
+				# x already in correct range 0 <-> resolution - 1
+				# y is - margin to - 1
+				# so we want (0, - margin) = (0, 1)     and     (resolution - 1, - margin)  = (1, 1)
+				# and        (0, 0)        = (0, 0)     and     (resolution - 1, 0)         = (1, 0)
+				
+				uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (margin * -1))
 				
 			# elif y < 0: # top right margin square
 			# elif x < 0 and y < resolution # left edge margin
