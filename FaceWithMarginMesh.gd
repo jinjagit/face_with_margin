@@ -15,7 +15,6 @@ func spherize(pointOnUnitCube : Vector3):
 
 func displace_vertically(factor : float, step: float):
 	var v_offset : float = factor * step * 2.0
-	print(v_offset)
 
 	var new_normal := Vector3(0.0, 0.0, 0.0)
 	if normal.z > 0.0:
@@ -68,7 +67,15 @@ func generate_mesh():
 				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
 				uv_array[i] = Vector2(0.0, 0.0)
 
-			# elif x < resolution and y < 0: # top edge margin
+			elif x < resolution and y < 0: # top edge margin
+				factor = y * -1.0
+
+				var new_normal : Vector3 = displace_vertically(factor, step)
+				# TODO: display 'horizontally' as appropriate
+				percent = Vector2((x * 1.0) / (resolution - 1), 0.0)
+				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+				uv_array[i] = Vector2(0.0, 0.0)
+				
 			# elif y < 0: # top right margin square
 			# elif x < 0 and y < resolution # left edge margin
 
