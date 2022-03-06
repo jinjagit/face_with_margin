@@ -13,8 +13,8 @@ func spherize(pointOnUnitCube : Vector3):
 	var sz := pointOnUnitCube.z * sqrt(1.0 - x2 / 2.0 - y2 / 2.0 + x2 * y2 / 3.0)
 	return Vector3(sx, sy, sz)
 
-func displace_vertically(factor : float, step: float):
-	var v_offset : float = factor * step * 2.0
+func displace_vertically(factor : float, resolution: int):
+	var v_offset : float = factor * (1.0 / (resolution - 1)) * 2.0
 
 	var new_normal := Vector3(0.0, 0.0, 0.0)
 	if normal.z > 0.0:
@@ -43,6 +43,10 @@ func set_triangle_indices(index_ary : PoolIntArray, tri_index : int, a : int, b 
 	
 	return index_ary
 
+func vertex_posn(face_normal : Vector3, percent : Vector2, axisA : Vector3, axisB : Vector3, spherized):
+	var pointOnUnitCube = face_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+	return spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+			
 func generate_mesh():		
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
@@ -52,15 +56,14 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 
-	var resolution := 30
+	var resolution := 128
 	var margin := 3
-	var step = 1.0 / (resolution - 1) # We can probably lose this.
 	var res_sq = resolution * resolution
 	var res_sq2 = resolution * (resolution -1)
 	var num_vertices : int = res_sq + (margin * (resolution - 1) * 4)
 	var num_indices : int = ((resolution - 1) * (resolution -1) * 6) + (margin * (resolution - 1) * 24)
 
-	var spherized = true
+	var spherized = false
 
 	vertex_array.resize(num_vertices)
 	uv_array.resize(num_vertices)
@@ -71,7 +74,6 @@ func generate_mesh():
 	var axisA := Vector3(normal.y, normal.z, normal.x)
 	var axisB : Vector3 = normal.cross(axisA)
 	var percent := Vector2(0.0, 0.0)
-	var pointOnUnitCube := Vector3(0.0, 0.0, 0.0)
 	var i : int = 0
 
 	# ----------- The actual cube face mesh: --------------
@@ -79,11 +81,8 @@ func generate_mesh():
 	for y in range(resolution):
 		for x in range(resolution):
 			percent = Vector2(x, y) / (resolution - 1)
-			pointOnUnitCube = normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-			# Must convert integers to floats!
+			vertex_array[i] = vertex_posn(normal, percent, axisA, axisB, spherized)
 			uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (resolution - 1))
-
-			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
 
 			if x != resolution - 1 and y != resolution - 1:
 				index_array = set_triangle_indices(index_array, tri_index, i, i + resolution + 1, i + resolution, i, i + 1, i + resolution + 1)
@@ -95,15 +94,14 @@ func generate_mesh():
 
 	for m in range(margin):
 		# Calculate 'vertical' offset.
-		var new_normal : Vector3 = displace_vertically((m + 1) * 1.0, step)
+		var new_normal : Vector3 = displace_vertically((m + 1) * 1.0, resolution)
 
 		# 'Top' edge margin:
 		for x in range(resolution - 1):
 			percent = Vector2((x * 1.0) / (resolution - 1), 0.0)
-			pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+			vertex_array[i] = vertex_posn(new_normal, percent, axisA, axisB, spherized)
 			
-			# create margin row
+			# Margin row
 			if x != resolution - 2:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, x, i, i + 1, x, i + 1, x + 1)
@@ -116,10 +114,9 @@ func generate_mesh():
 		# 'Right' edge margin:
 		for x in range(resolution - 1):
 			percent = Vector2(1.0, (x * 1.0) / (resolution - 1))
-			pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+			vertex_array[i] = vertex_posn(new_normal, percent, axisA, axisB, spherized)
 			
-			# connect with end of previous margin row
+			# Connect with end of previous margin row
 			if x == 0:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, resolution - 2, i - 1, i, resolution - 2, i, resolution -1)
@@ -127,7 +124,7 @@ func generate_mesh():
 					index_array = set_triangle_indices(index_array, tri_index, i - ((resolution -1) * 4) - 1, i - 1, i, i - ((resolution -1) * 4) - 1, i, i - ((resolution -1) * 4))
 				tri_index += 6
 
-			# create margin row
+			# Margin row
 			if x != resolution - 2:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, (resolution - 1) + (x * resolution), i, i + 1, (resolution - 1) + (x * resolution), i + 1, (resolution - 1) + ((x  + 1) * resolution))
@@ -140,10 +137,9 @@ func generate_mesh():
 		# 'Bottom' edge margin:
 		for x in range(resolution - 1):
 			percent = Vector2(((resolution - 1 - x) * 1.0) / (resolution - 1), 1.0)
-			pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+			vertex_array[i] = vertex_posn(new_normal, percent, axisA, axisB, spherized)
 
-			# connect with end of previous margin row
+			# Connect with end of previous margin row
 			if x == 0:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, res_sq - resolution - 1, i - 1, i, res_sq - resolution - 1, i, res_sq - 1)
@@ -151,7 +147,7 @@ func generate_mesh():
 					index_array = set_triangle_indices(index_array, tri_index, i - ((resolution -1) * 4) - 1, i - 1, i, i - ((resolution -1) * 4) - 1, i, i - ((resolution -1) * 4))
 				tri_index += 6
 
-			# create margin row
+			# Margin row
 			if x != resolution - 2:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, res_sq - 1 - x, i, i + 1, res_sq - 1 - x, i + 1, res_sq - 2 - x)
@@ -164,10 +160,9 @@ func generate_mesh():
 		# 'Left' edge margin:
 		for x in range(resolution - 1):
 			percent = Vector2(0.0, ((resolution - 1 - x) * 1.0) / (resolution - 1))
-			pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+			vertex_array[i] = vertex_posn(new_normal, percent, axisA, axisB, spherized)
 
-			# connect with end of previous margin row
+			# Connect with end of previous margin row
 			if x == 0:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, res_sq2 + 1, i - 1, i, res_sq2 + 1, i, res_sq2)
@@ -175,7 +170,7 @@ func generate_mesh():
 					index_array = set_triangle_indices(index_array, tri_index, i - ((resolution -1) * 4) - 1, i - 1, i, i - ((resolution -1) * 4) - 1, i, i - ((resolution -1) * 4))
 				tri_index += 6
 
-			# create margin row
+			# Margin row
 			if x != resolution - 2:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, res_sq2 - (x * resolution), i, i + 1, res_sq2 - (x * resolution), i + 1, res_sq2 - ((x + 1) * resolution))
@@ -183,20 +178,13 @@ func generate_mesh():
 					index_array = set_triangle_indices(index_array, tri_index, i - ((resolution -1) * 4), i, i + 1, i - ((resolution -1) * 4), i + 1, i - ((resolution -1) * 4) + 1)
 				tri_index += 6
 				
-			# connect with start of margin row
+			# Connect with start of margin row
 			if x == resolution - 2:
 				if m == 0:
 					index_array = set_triangle_indices(index_array, tri_index, resolution, i, i - ((resolution - 1) * 4) + 1, resolution, i - ((resolution - 1) * 4) + 1, 0)
-					tri_index += 6
 				else:
-					index_array[tri_index + 2] = i - ((resolution - 1) * 4)
-					index_array[tri_index + 1] = i
-					index_array[tri_index] = i - ((resolution - 1) * 4) + 1	
-					
-					index_array[tri_index + 5] = i - ((resolution - 1) * 4)
-					index_array[tri_index + 4] = i - ((resolution - 1) * 4) + 1
-					index_array[tri_index + 3] = i - ((resolution - 1) * 8) + 1
-					tri_index += 6
+					index_array = set_triangle_indices(index_array, tri_index, i - ((resolution - 1) * 4), i, i - ((resolution - 1) * 4) + 1, i - ((resolution - 1) * 4), i - ((resolution - 1) * 4) + 1, i - ((resolution - 1) * 8) + 1)
+				tri_index += 6
 
 			i += 1
 
@@ -224,8 +212,11 @@ func generate_mesh():
 	arrays[Mesh.ARRAY_INDEX] = index_array
 
 	print("n vertices {v}".format({"v":vertex_array.size()}))
-	print("uv0: {v}".format({"v":uv_array[9]}))
-	print("normal: {v}".format({"v":normal}))
+	print("n triangles {t}".format({"t":index_array.size() / 3.0}))
+	var pc_vertices : float = (margin * 1.0 * (resolution - 1) * 4) / (res_sq + (margin * (resolution - 1) * 4)) * 100
+	print("percent vertices in margin {pcv}".format({"pcv":pc_vertices}))
+	var pc_triangles : float = ((margin * 1.0 * (resolution - 1) * 24) / (((resolution - 1) * (resolution -1) * 6) + (margin * (resolution - 1) * 24))) / 3.0 * 100.0
+	print("percent triangles in margin {pct}".format({"pct":pc_triangles}))
 
 	call_deferred("_update_mesh", arrays)#
 
@@ -237,4 +228,3 @@ func _update_mesh(arrays : Array):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	rotate_object_local(Vector3(0, 1, 0), delta/5)
-
