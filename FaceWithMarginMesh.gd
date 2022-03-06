@@ -19,10 +19,16 @@ func displace_vertically(factor : float, step: float):
 	var new_normal := Vector3(0.0, 0.0, 0.0)
 	if normal.z > 0.0:
 		new_normal = Vector3(0.0, 0.0, normal.z - v_offset)
+	elif normal.z < 0.0:
+		new_normal = Vector3(0.0, 0.0, normal.z + v_offset)
 	elif normal.y > 0.0:
 		new_normal = Vector3(0.0, normal.y - v_offset, 0.0)
-	else:
+	elif normal.y < 0.0:
+		new_normal = Vector3(0.0, normal.y + v_offset, 0.0)
+	elif normal.x > 0.0:
 		new_normal = Vector3(normal.x - v_offset, 0.0, 0.0)
+	else:
+		new_normal = Vector3(normal.x + v_offset, 0.0, 0.0)
 
 	return new_normal
 
@@ -35,8 +41,8 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 
-	var resolution := 7
-	var margin := 3
+	var resolution := 12
+	var margin := 4
 	var width := resolution + (2 * margin) # 11
 	var step = 1.0 / (resolution - 1)
 	var corner_offset = 0.8 # Must be 0.0 < value < 1.0
@@ -68,7 +74,7 @@ func generate_mesh():
 				
 				# Displace 'horizontally' as appropriate
 				if x < y:
-					percent = Vector2( 0.0, ((margin * 1.0) + y) / (margin * corner_offset) / (resolution - 1))
+					percent = Vector2( 0.0, ((margin * 1.0) + y) / margin * corner_offset / (resolution - 1))
 				elif x > y:
 					percent = Vector2( ((margin * 1.0) + x) / margin * corner_offset / (resolution - 1), 0.0)
 				else:
@@ -79,8 +85,8 @@ func generate_mesh():
 
 			elif x < resolution and y < 0: # top edge margin
 				factor = y * -1.0
-
 				var new_normal : Vector3 = displace_vertically(factor, step)
+				
 				# Displace 'horizontally' as appropriate
 				if x == 0: # or x == resolution -1:
 					percent = Vector2( corner_offset / (resolution - 1), 0.0)
