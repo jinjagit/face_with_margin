@@ -31,8 +31,19 @@ func displace_vertically(factor : float, step: float):
 		new_normal = Vector3(normal.x + v_offset, 0.0, 0.0)
 
 	return new_normal
+	
+func set_triangle_indices(index_ary : PoolIntArray, tri_index : int, a : int, b : int, c : int, d : int, e : int, f: int):
+	index_ary[tri_index + 2] = a
+	index_ary[tri_index + 1] = b
+	index_ary[tri_index] = c
 
-func generate_mesh():
+	index_ary[tri_index + 5] = d
+	index_ary[tri_index + 4] = e
+	index_ary[tri_index + 3] = f
+	
+	return index_ary
+
+func generate_mesh():		
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 
@@ -41,10 +52,12 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 
-	var resolution := 17
+	var resolution := 12
 	var margin := 1
 	var step = 1.0 / (resolution - 1) # We can probably lose this.
-	var num_vertices : int = (resolution * resolution) + (margin * (resolution - 1) * 4) # 4
+	var res_sq = resolution * resolution
+	var res_sq2 = resolution * (resolution -1)
+	var num_vertices : int = res_sq + (margin * (resolution - 1) * 4) # 4
 	var num_indices : int = ((resolution - 1) * (resolution -1) * 6) + (margin * (resolution - 1) * 24)
 
 	var spherized = true
@@ -76,13 +89,7 @@ func generate_mesh():
 			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
 
 			if x != resolution - 1 and y != resolution - 1:
-				index_array[tri_index + 2] = i
-				index_array[tri_index + 1] = i + resolution + 1
-				index_array[tri_index] = i + resolution
-
-				index_array[tri_index + 5] = i
-				index_array[tri_index + 4] = i + 1
-				index_array[tri_index + 3] = i + resolution + 1
+				index_array = set_triangle_indices(index_array, tri_index, i, i + resolution + 1, i + resolution, i, i + 1, i + resolution + 1)
 				tri_index += 6
 
 			i += 1
@@ -103,13 +110,7 @@ func generate_mesh():
 
 				# create margin row
 				if x != resolution - 2:
-					index_array[tri_index + 2] = x
-					index_array[tri_index + 1] = i
-					index_array[tri_index] = i + 1
-
-					index_array[tri_index + 5] = x
-					index_array[tri_index + 4] = i + 1
-					index_array[tri_index + 3] = x + 1
+					index_array = set_triangle_indices(index_array, tri_index, x, i, i + 1, x, i + 1, x + 1)
 					tri_index += 6
 
 			i += 1
@@ -125,24 +126,12 @@ func generate_mesh():
 
 				# connect with end of previous margin row
 				if x == 0:
-					index_array[tri_index + 2] = resolution - 2
-					index_array[tri_index + 1] = i - 1
-					index_array[tri_index] = i
-
-					index_array[tri_index + 5] = resolution - 2
-					index_array[tri_index + 4] = i
-					index_array[tri_index + 3] = resolution - 1
+					index_array = set_triangle_indices(index_array, tri_index, resolution - 2, i - 1, i, resolution - 2, i, resolution -1)
 					tri_index += 6
 
 				# create margin row
 				if x != resolution - 2:
-					index_array[tri_index + 2] = (resolution - 1) + (x * resolution)
-					index_array[tri_index + 1] = i
-					index_array[tri_index] = i + 1
-
-					index_array[tri_index + 5] = (resolution - 1) + (x * resolution)
-					index_array[tri_index + 4] = i + 1
-					index_array[tri_index + 3] = (resolution - 1) + ((x  + 1) * resolution)
+					index_array = set_triangle_indices(index_array, tri_index, (resolution - 1) + (x * resolution), i, i + 1, (resolution - 1) + (x * resolution), i + 1, (resolution - 1) + ((x  + 1) * resolution))
 					tri_index += 6
 
 			i += 1
@@ -158,24 +147,12 @@ func generate_mesh():
 
 				# connect with end of previous margin row
 				if x == 0:
-					index_array[tri_index + 2] = (resolution * resolution) - resolution - 1
-					index_array[tri_index + 1] = i - 1
-					index_array[tri_index] = i
-
-					index_array[tri_index + 5] = (resolution * resolution) - resolution - 1
-					index_array[tri_index + 4] = i
-					index_array[tri_index + 3] = (resolution * resolution) - 1
+					index_array = set_triangle_indices(index_array, tri_index, res_sq - resolution - 1, i - 1, i, res_sq - resolution - 1, i, res_sq - 1)
 					tri_index += 6
 
 				# create margin row
 				if x != resolution - 2:
-					index_array[tri_index + 2] = (resolution * resolution) - 1 - x
-					index_array[tri_index + 1] = i
-					index_array[tri_index] = i + 1
-
-					index_array[tri_index + 5] = (resolution * resolution) - 1 - x
-					index_array[tri_index + 4] = i + 1
-					index_array[tri_index + 3] = (resolution * resolution) - 2 - x
+					index_array = set_triangle_indices(index_array, tri_index, res_sq - 1 - x, i, i + 1, res_sq - 1 - x, i + 1, res_sq - 2 - x)
 					tri_index += 6
 
 			i += 1
@@ -191,35 +168,17 @@ func generate_mesh():
 
 				# connect with end of previous margin row
 				if x == 0:
-					index_array[tri_index + 2] = (resolution * (resolution -1)) + 1
-					index_array[tri_index + 1] = i - 1
-					index_array[tri_index] = i
-
-					index_array[tri_index + 5] = (resolution * (resolution -1)) + 1
-					index_array[tri_index + 4] = i
-					index_array[tri_index + 3] = (resolution * (resolution -1))
+					index_array = set_triangle_indices(index_array, tri_index, res_sq2 + 1, i - 1, i, res_sq2 + 1, i, res_sq2)
 					tri_index += 6
 
 				# create margin row
 				if x != resolution - 2:
-					index_array[tri_index + 2] = (resolution * (resolution -1)) - (x * resolution)
-					index_array[tri_index + 1] = i
-					index_array[tri_index] = i + 1
-
-					index_array[tri_index + 5] = (resolution * (resolution -1)) - (x * resolution)
-					index_array[tri_index + 4] = i + 1
-					index_array[tri_index + 3] = (resolution * (resolution -1)) - ((x + 1) * resolution)
+					index_array = set_triangle_indices(index_array, tri_index, res_sq2 - (x * resolution), i, i + 1, res_sq2 - (x * resolution), i + 1, res_sq2 - ((x + 1) * resolution))
 					tri_index += 6
 					
 				# connect with start of margin row
 				if x == resolution - 2:
-					index_array[tri_index + 2] = resolution
-					index_array[tri_index + 1] = i
-					index_array[tri_index] = i - ((resolution - 1) * 4) + 1
-
-					index_array[tri_index + 5] = resolution
-					index_array[tri_index + 4] = i - ((resolution - 1) * 4) + 1
-					index_array[tri_index + 3] = 0
+					index_array = set_triangle_indices(index_array, tri_index, resolution, i, i - ((resolution - 1) * 4) + 1, resolution, i - ((resolution - 1) * 4) + 1, 0)
 					tri_index += 6
 
 			i += 1
