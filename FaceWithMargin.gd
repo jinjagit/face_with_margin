@@ -41,11 +41,13 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 
-	var resolution := 12
-	var margin := 0
+	var resolution := 17
+	var margin := 1
 	var step = 1.0 / (resolution - 1) # We can probably lose this.
-	var num_vertices : int = resolution * resolution + (margin * (resolution - 1) * 4)
-	var num_indices : int = (resolution - 1) * (resolution -1) * 6 + (margin * (resolution - 1) * 24)
+	var num_vertices : int = (resolution * resolution) + (margin * (resolution - 1) * 4) # 4
+	var num_indices : int = ((resolution - 1) * (resolution -1) * 6) + (margin * (resolution - 1) * 24)
+
+	var spherized = true
 
 	vertex_array.resize(num_vertices)
 	uv_array.resize(num_vertices)
@@ -57,11 +59,12 @@ func generate_mesh():
 	var axisB : Vector3 = normal.cross(axisA)
 	var percent := Vector2(0.0, 0.0)
 	var pointOnUnitCube := Vector3(0.0, 0.0, 0.0)
-	var factor := 0.0
 	var i : int = 0
-	
+
 	# For reference, the default percent calc:
 	# var percent := Vector2(x, y) / (resolution - 1)
+
+	# ----------- The actual cube face mesh: --------------
 
 	for y in range(resolution):
 		for x in range(resolution):
@@ -70,8 +73,7 @@ func generate_mesh():
 			# Must convert integers to floats!
 			uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (resolution - 1))
 
-			#vertex_array[i] = spherize(pointOnUnitCube)
-			vertex_array[i] = pointOnUnitCube
+			vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
 
 			if x != resolution - 1 and y != resolution - 1:
 				index_array[tri_index + 2] = i
@@ -84,6 +86,144 @@ func generate_mesh():
 				tri_index += 6
 
 			i += 1
+
+	# ----------- The margin mesh: --------------
+
+	for m in range(margin):
+		# Calculate 'vertical' offset.
+		var new_normal : Vector3 = displace_vertically((m + 1) * 1.0, step)
+
+		# 'Top' edge margin:
+		for x in range(resolution - 1):
+			if m == 0:
+				percent = Vector2((x * 1.0) / (resolution - 1), 0.0)
+				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+
+				vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+
+				# create margin row
+				if x != resolution - 2:
+					index_array[tri_index + 2] = x
+					index_array[tri_index + 1] = i
+					index_array[tri_index] = i + 1
+
+					index_array[tri_index + 5] = x
+					index_array[tri_index + 4] = i + 1
+					index_array[tri_index + 3] = x + 1
+					tri_index += 6
+
+			i += 1
+			#else:
+
+		# 'Right' edge margin:
+		for x in range(resolution - 1):
+			if m == 0:
+				percent = Vector2(1.0, (x * 1.0) / (resolution - 1))
+				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+
+				vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+
+				# connect with end of previous margin row
+				if x == 0:
+					index_array[tri_index + 2] = resolution - 2
+					index_array[tri_index + 1] = i - 1
+					index_array[tri_index] = i
+
+					index_array[tri_index + 5] = resolution - 2
+					index_array[tri_index + 4] = i
+					index_array[tri_index + 3] = resolution - 1
+					tri_index += 6
+
+				# create margin row
+				if x != resolution - 2:
+					index_array[tri_index + 2] = (resolution - 1) + (x * resolution)
+					index_array[tri_index + 1] = i
+					index_array[tri_index] = i + 1
+
+					index_array[tri_index + 5] = (resolution - 1) + (x * resolution)
+					index_array[tri_index + 4] = i + 1
+					index_array[tri_index + 3] = (resolution - 1) + ((x  + 1) * resolution)
+					tri_index += 6
+
+			i += 1
+			#else:
+
+		# 'Bottom' edge margin:
+		for x in range(resolution - 1):
+			if m == 0:
+				percent = Vector2(((resolution - 1 - x) * 1.0) / (resolution - 1), 1.0)
+				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+
+				vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+
+				# connect with end of previous margin row
+				if x == 0:
+					index_array[tri_index + 2] = (resolution * resolution) - resolution - 1
+					index_array[tri_index + 1] = i - 1
+					index_array[tri_index] = i
+
+					index_array[tri_index + 5] = (resolution * resolution) - resolution - 1
+					index_array[tri_index + 4] = i
+					index_array[tri_index + 3] = (resolution * resolution) - 1
+					tri_index += 6
+
+				# create margin row
+				if x != resolution - 2:
+					index_array[tri_index + 2] = (resolution * resolution) - 1 - x
+					index_array[tri_index + 1] = i
+					index_array[tri_index] = i + 1
+
+					index_array[tri_index + 5] = (resolution * resolution) - 1 - x
+					index_array[tri_index + 4] = i + 1
+					index_array[tri_index + 3] = (resolution * resolution) - 2 - x
+					tri_index += 6
+
+			i += 1
+			#else:
+
+		# 'Left' edge margin:
+		for x in range(resolution - 1):
+			if m == 0:
+				percent = Vector2(0.0, ((resolution - 1 - x) * 1.0) / (resolution - 1))
+				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
+
+				vertex_array[i] = spherize(pointOnUnitCube) if spherized else pointOnUnitCube
+
+				# connect with end of previous margin row
+				if x == 0:
+					index_array[tri_index + 2] = (resolution * (resolution -1)) + 1
+					index_array[tri_index + 1] = i - 1
+					index_array[tri_index] = i
+
+					index_array[tri_index + 5] = (resolution * (resolution -1)) + 1
+					index_array[tri_index + 4] = i
+					index_array[tri_index + 3] = (resolution * (resolution -1))
+					tri_index += 6
+
+				# create margin row
+				if x != resolution - 2:
+					index_array[tri_index + 2] = (resolution * (resolution -1)) - (x * resolution)
+					index_array[tri_index + 1] = i
+					index_array[tri_index] = i + 1
+
+					index_array[tri_index + 5] = (resolution * (resolution -1)) - (x * resolution)
+					index_array[tri_index + 4] = i + 1
+					index_array[tri_index + 3] = (resolution * (resolution -1)) - ((x + 1) * resolution)
+					tri_index += 6
+					
+				# connect with start of margin row
+				if x == resolution - 2:
+					index_array[tri_index + 2] = resolution
+					index_array[tri_index + 1] = i
+					index_array[tri_index] = i - ((resolution - 1) * 4) + 1
+
+					index_array[tri_index + 5] = resolution
+					index_array[tri_index + 4] = i - ((resolution - 1) * 4) + 1
+					index_array[tri_index + 3] = 0
+					tri_index += 6
+
+			i += 1
+			#else:
 
 	# Calculate normal for each triangle
 	for a in range(0, index_array.size(), 3):
