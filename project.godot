@@ -12,7 +12,7 @@ _global_script_classes=[ {
 "base": "MeshInstance",
 "class": "FaceWithMargin",
 "language": "GDScript",
-"path": "res://FaceWithMarginMesh.gd"
+"path": "res://FaceWithMargin.gd"
 }, {
 "base": "MeshInstance",
 "class": "FaceWithMarginOLD",
@@ -22,7 +22,7 @@ _global_script_classes=[ {
 "base": "MeshInstance",
 "class": "FaceWithMarginOLD2",
 "language": "GDScript",
-"path": "res://FaceWithMargin.gd"
+"path": "res://FaceWithMarginMesh.gd"
 }, {
 "base": "MeshInstance",
 "class": "PlanetMeshFace",

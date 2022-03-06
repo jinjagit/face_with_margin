@@ -1,6 +1,6 @@
 tool
 extends MeshInstance
-class_name FaceWithMargin
+class_name FaceWithMarginOLD2
 
 export var normal : Vector3
 
