@@ -11,7 +11,7 @@ albedo_texture = ExtResource( 2 )
 script = ExtResource( 1 )
 
 [node name="FaceWithMargin" type="MeshInstance" parent="."]
-transform = Transform( -0.707548, 0, 0.710879, 0, 1, 0, -0.710879, 0, -0.707548, 0, 0, 0 )
+transform = Transform( -0.739393, 0, 0.677629, 0, 1, 0, -0.677629, 0, -0.739393, 0, 0, 0 )
 material_override = SubResource( 1 )
 script = ExtResource( 4 )
-normal = Vector3( 0, 0, 1 )
+normal = Vector3( 0, 1, 0 )
