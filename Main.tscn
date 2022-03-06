@@ -6,7 +6,7 @@
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.00535631, 0 )
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.71674, 0.69734, 0, -0.69734, 0.71674, 0, 3.22886, 4.03467 )
+transform = Transform( 1, 0, 0, 0, 0.71674, 0.69734, 0, -0.69734, 0.71674, 0, 2.82067, 3.28009 )
 current = true
 
 [node name="Planet" parent="." instance=ExtResource( 1 )]

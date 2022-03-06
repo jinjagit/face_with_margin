@@ -39,6 +39,7 @@ func generate_mesh():
 	var margin := 3
 	var width := resolution + (2 * margin) # 11
 	var step = 1.0 / (resolution - 1)
+	var corner_offset = 0.8 # Must be 0.0 < value < 1.0
 	var num_vertices : int = width * width
 	var num_indices : int = (width - 1) * (width -1) * 6
 
@@ -54,32 +55,39 @@ func generate_mesh():
 	var pointOnUnitCube := Vector3(0.0, 0.0, 0.0)
 	var factor := 0.0
 	var i : int = 0
+	
+	# For reference, the default percent calc:
+	# var percent := Vector2(x, y) / (resolution - 1)
 
 	for y in range(margin * -1, width - margin): # -3 <-> 8
 		for x in range(margin * -1, width - margin):
 
 			if x < 0 and y < 0: # top left margin square
 				factor = x * -1.0 if x < y else y * -1.0
-
 				var new_normal : Vector3 = displace_vertically(factor, step)
-				# TODO: display 'horizontally' as appropriate
-				percent = Vector2(0.0, 0.0)
+				
+				# Displace 'horizontally' as appropriate
+				if x < y:
+					percent = Vector2( 0.0, ((margin * 1.0) + y) / (margin * corner_offset) / (resolution - 1))
+				elif x > y:
+					percent = Vector2( ((margin * 1.0) + x) / margin * corner_offset / (resolution - 1), 0.0)
+				else:
+					percent = Vector2(0.0, 0.0)
+				
 				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-				uv_array[i] = Vector2(0.0, 0.0)
+				uv_array[i] = Vector2((x + margin) * 1.0 / margin, (y + margin) * 1.0 / margin)
 
 			elif x < resolution and y < 0: # top edge margin
 				factor = y * -1.0
 
 				var new_normal : Vector3 = displace_vertically(factor, step)
-				# TODO: display 'horizontally' as appropriate
-				percent = Vector2((x * 1.0) / (resolution - 1), 0.0)
+				# Displace 'horizontally' as appropriate
+				if x == 0: # or x == resolution -1:
+					percent = Vector2( corner_offset / (resolution - 1), 0.0)
+				else:
+					percent = Vector2((x * 1.0) / (resolution - 1), 0.0)
+					
 				pointOnUnitCube = new_normal + (percent.x - 0.5) * 2.0 * axisA + (percent.y - 0.5) * 2.0 * axisB
-				
-				# x already in correct range 0 <-> resolution - 1
-				# y is - margin to - 1
-				# so we want (0, - margin) = (0, 1)     and     (resolution - 1, - margin)  = (1, 1)
-				# and        (0, 0)        = (0, 0)     and     (resolution - 1, 0)         = (1, 0)
-				
 				uv_array[i] = Vector2((x * 1.0) / (resolution - 1), (y * 1.0) / (margin * -1))
 				
 			# elif y < 0: # top right margin square
