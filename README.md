@@ -18,6 +18,6 @@ After flipping margin triangles and normals, with very low-res mesh of only 16 *
 
 ![no_seams](https://user-images.githubusercontent.com/3944042/157125696-869ef6d9-d057-4672-b9e9-2e787d0d1fc3.png)
 
-With a mesh density of 64 vertices per face edge, the seams are completely invisible with the spehere full screen on 4k display.
+With a mesh density of 64 vertices per face edge, the seams are completely invisible with the spehere fullscreen on 4k display.
 
 So, this technique is a definite success.
