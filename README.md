@@ -1,6 +1,6 @@
 # Cube-sphere face with margin
 
-Idea: Adding a margin means that triangles at edge of 'face' will be correctly curved to fit with curve formed by margin, rather than creating a visible 'seam' due to having no information on the mesh curve beyond the edge (as is case when mesh ends at the face edge).
+Idea: Adding a margin means that triangles at edge of 'face' will be correctly curved to fit with curve formed by margin, rather than creating a visible 'seam' due to having no information about the mesh curve beyond the edge (as is case when mesh ends at the face edge).
 
 This should also mean we can tile the texture 9 times, using calculated uvs, if we somehow include vertices 'around' the face corners (to overcome the 3-way intersections of cube-sphere face corners which would make such tiling impossible.)
 
@@ -13,3 +13,11 @@ And now we have already got a way to calculate offset along face normal for marg
 With visible margin (non-flipped triangles) & png texture on cube-sphere face (face = 64 * 64 vertices):
 
 ![with_margin](https://user-images.githubusercontent.com/3944042/156945504-62453664-0820-4a53-9656-e3abfc7f138b.png)
+
+After flipping margin triangles and normals, with very low-res mesh of only 16 * 16 vertices per face edge to accentuate seams, and a mostly flat colour PNG texture on each face. [left is without margins, right is with hidden margins]:
+
+![no_seams](https://user-images.githubusercontent.com/3944042/157125696-869ef6d9-d057-4672-b9e9-2e787d0d1fc3.png)
+
+With a mesh density of 64 vertices per face edge, the seams are completely invisible with the spehere fullscreen on 4k display.
+
+So, this technique is a definite success.
