@@ -14,10 +14,10 @@ With visible margin (non-flipped triangles) & png texture on cube-sphere face (f
 
 ![with_margin](https://user-images.githubusercontent.com/3944042/156945504-62453664-0820-4a53-9656-e3abfc7f138b.png)
 
-After flipping margin triangles and normals, with low-res mesh of only 16 * 16 vertices per face edge to accentuate seams, and a mostly flat colour PNG texture on each face. [left is without marging, right is with hidden mnargins]:
+After flipping margin triangles and normals, with very low-res mesh of only 16 * 16 vertices per face edge to accentuate seams, and a mostly flat colour PNG texture on each face. [left is without margins, right is with hidden margins]:
 
 ![no_seams](https://user-images.githubusercontent.com/3944042/157125696-869ef6d9-d057-4672-b9e9-2e787d0d1fc3.png)
 
-With a resonable mesh density of 64 vertices per face edge, the seams are completely invisible with the spehere full screen on 4k display.
+With a mesh density of 64 vertices per face edge, the seams are completely invisible with the spehere full screen on 4k display.
 
 So, this technique is a definite success.
