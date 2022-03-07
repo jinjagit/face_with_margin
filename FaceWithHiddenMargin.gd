@@ -56,7 +56,7 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 
-	var resolution := 32
+	var resolution := 16
 	var margin := 3
 	var res_sq = resolution * resolution
 	var res_sq2 = resolution * (resolution -1)
@@ -198,9 +198,14 @@ func generate_mesh():
 		var cross_ab_bc : Vector3 = ab.cross(bc) * -1.0
 		var cross_bc_ca : Vector3 = bc.cross(ca) * -1.0
 		var cross_ca_ab : Vector3 = ca.cross(ab) * -1.0
-		normal_array[index_array[a]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
-		normal_array[index_array[b]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
-		normal_array[index_array[c]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
+		if a < ((resolution - 1) * (resolution -1) * 6):
+			normal_array[index_array[a]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
+			normal_array[index_array[b]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
+			normal_array[index_array[c]] += cross_ab_bc + cross_bc_ca + cross_ca_ab
+		else:
+			normal_array[index_array[a]] += (cross_ab_bc + cross_bc_ca + cross_ca_ab) * Vector3(-1.0, -1.0, -1.0)
+			normal_array[index_array[b]] += (cross_ab_bc + cross_bc_ca + cross_ca_ab) * Vector3(-1.0, -1.0, -1.0)
+			normal_array[index_array[c]] += (cross_ab_bc + cross_bc_ca + cross_ca_ab) * Vector3(-1.0, -1.0, -1.0)
 
 	# Normalize length of normals
 	for j in range(normal_array.size()):

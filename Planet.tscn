@@ -1,42 +1,62 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Planet.gd" type="Script" id=1]
+[ext_resource path="res:// purpleX.png" type="Texture" id=2]
 [ext_resource path="res://FaceWithHiddenMargin.gd" type="Script" id=3]
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="SpatialMaterial" id=4]
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="SpatialMaterial" id=5]
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="SpatialMaterial" id=6]
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_texture = ExtResource( 2 )
 
 [node name="Planet" type="Spatial"]
 script = ExtResource( 1 )
 
 [node name="Up" type="MeshInstance" parent="."]
-transform = Transform( -0.984333, 0, 0.179111, 0, 1, 0, -0.179111, 0, -0.984333, 0, 0, 0 )
+transform = Transform( -0.23593, 0, -0.972296, 0, 1, 0, 0.972296, 0, -0.23593, 0, 0, 0 )
+material_override = SubResource( 2 )
 script = ExtResource( 3 )
 normal = Vector3( 0, 1, 0 )
 
 [node name="Down" type="MeshInstance" parent="."]
-transform = Transform( -0.984333, 0, 0.179111, 0, 1, 0, -0.179111, 0, -0.984333, 0, 0, 0 )
-visible = false
+transform = Transform( -0.23593, 0, -0.972296, 0, 1, 0, 0.972296, 0, -0.23593, 0, 0, 0 )
+material_override = SubResource( 3 )
 script = ExtResource( 3 )
 normal = Vector3( 0, -1, 0 )
 
 [node name="Left" type="MeshInstance" parent="."]
-transform = Transform( -0.984333, 0, 0.179111, 0, 1, 0, -0.179111, 0, -0.984333, 0, 0, 0 )
-visible = false
+transform = Transform( -0.23593, 0, -0.972296, 0, 1, 0, 0.972296, 0, -0.23593, 0, 0, 0 )
+material_override = SubResource( 4 )
 script = ExtResource( 3 )
 normal = Vector3( -1, 0, 0 )
 
 [node name="Right" type="MeshInstance" parent="."]
-transform = Transform( -0.984333, 0, 0.179111, 0, 1, 0, -0.179111, 0, -0.984333, 0, 0, 0 )
-visible = false
+transform = Transform( -0.23593, 0, -0.972296, 0, 1, 0, 0.972296, 0, -0.23593, 0, 0, 0 )
+material_override = SubResource( 5 )
 script = ExtResource( 3 )
 normal = Vector3( 1, 0, 0 )
 
 [node name="Back" type="MeshInstance" parent="."]
-transform = Transform( -0.984333, 0, 0.179111, 0, 1, 0, -0.179111, 0, -0.984333, 0, 0, 0 )
-visible = false
+transform = Transform( -0.23593, 0, -0.972296, 0, 1, 0, 0.972296, 0, -0.23593, 0, 0, 0 )
+material_override = SubResource( 6 )
 script = ExtResource( 3 )
 normal = Vector3( 0, 0, -1 )
 
 [node name="Front" type="MeshInstance" parent="."]
-transform = Transform( -0.984333, 0, 0.179111, 0, 1, 0, -0.179111, 0, -0.984333, 0, 0, 0 )
-visible = false
+transform = Transform( -0.23593, 0, -0.972296, 0, 1, 0, 0.972296, 0, -0.23593, 0, 0, 0 )
+material_override = SubResource( 1 )
 script = ExtResource( 3 )
 normal = Vector3( 0, 0, 1 )
