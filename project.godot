@@ -10,6 +10,11 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "MeshInstance",
+"class": "FaceWithHiddenMargin",
+"language": "GDScript",
+"path": "res://FaceWithHiddenMargin.gd"
+}, {
+"base": "MeshInstance",
 "class": "FaceWithMargin",
 "language": "GDScript",
 "path": "res://FaceWithMargin.gd"
@@ -30,6 +35,7 @@ _global_script_classes=[ {
 "path": "res://PlanetMeshFace.gd"
 } ]
 _global_script_class_icons={
+"FaceWithHiddenMargin": "",
 "FaceWithMargin": "",
 "FaceWithMarginOLD": "",
 "FaceWithMarginOLD2": "",

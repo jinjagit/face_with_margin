@@ -11,6 +11,6 @@ func _input(event):
 		
 func _ready():
 	for child in get_children():
-		var face := child as FaceWithMargin
+		var face := child as FaceWithHiddenMargin
 		face.generate_mesh()
 
