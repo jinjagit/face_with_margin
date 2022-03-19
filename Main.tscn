@@ -15,7 +15,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0073781, 0.0169481, 0.00519
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( -0.36349, 0.713042, -0.599539, -0.286135, 0.527, 0.800249, 0.886568, 0.462431, 0.0124678, -36.988, 101.295, -56.0352 )
 light_color = Color( 0.823529, 0.713726, 0.537255, 1 )
-light_energy = 1.284
+light_energy = 3.245
 light_indirect_energy = 0.0
 light_specular = 1.433
 

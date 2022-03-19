@@ -56,7 +56,7 @@ func generate_mesh():
 	var normal_array := PoolVector3Array()
 	var index_array := PoolIntArray()
 
-	var resolution := 16
+	var resolution := 64
 	var margin := 3
 	var res_sq = resolution * resolution
 	var res_sq2 = resolution * (resolution -1)
